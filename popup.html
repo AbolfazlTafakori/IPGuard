@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IP Guard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<h2>🛡️ IP Guard</h2>
+
+<div id="status" class="status">Ready</div>
+
+<div class="info-box">
+    <div class="label">Your IP Address</div>
+    <div id="ip" class="ip-address">---</div>
+</div>
+
+<div class="details">
+    <div><span class="label">Country:</span> <span id="country">---</span></div>
+    <div><span class="label">City:</span> <span id="city">---</span></div>
+    <div><span class="label">ISP:</span> <span id="isp">---</span></div>
+    <div><span class="label">Type:</span> <span id="type">---</span></div>
+</div>
+
+<button id="check-btn">Check IP Now</button>
+
+<!-- WebRTC Protection -->
+<div class="webrtc-card">
+    <div class="webrtc-header">
+        <span>🛡️ WebRTC Protection</span>
+        <label class="toggle-switch">
+            <input type="checkbox" id="webrtc-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div id="webrtc-status" class="webrtc-status">
+        Status: Checking...
+    </div>
+</div>
+
+<div class="footer">
+    Made with ❤️ by Abolfazl
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
