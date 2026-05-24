@@ -1,4 +1,4 @@
-// popup.js - IP Guard (نسخه کامل با WebRTC Blocker)
+// popup.js - IP Guard (نسخه نهایی تمیز)
 const elements = {
     ip: document.getElementById('ip'),
     country: document.getElementById('country'),
@@ -11,36 +11,6 @@ const elements = {
     checkBtn: document.getElementById('check-btn')
 };
 
-// Load saved settings
-async function loadSettings() {
-    const data = await chrome.storage.local.get(['webrtcBlocked']);
-    const isBlocked = data.webrtcBlocked || false;
-    elements.webrtcToggle.checked = isBlocked;
-    applyWebRTCBlock(isBlocked);
-}
-
-// Apply WebRTC Block
-async function applyWebRTCBlock(enabled) {
-    try {
-        await chrome.privacy.network.webRTCIPHandlingPolicy.set({
-            value: enabled ? "disable_non_proxied_udp" : "default"
-        });
-
-        if (enabled) {
-            elements.webrtcStatus.innerHTML = "🛡️ <strong>WebRTC Blocked</strong><br>IP Leak Protection Active";
-            elements.webrtcStatus.style.color = "#22c55e";
-        } else {
-            elements.webrtcStatus.innerHTML = "⚠️ WebRTC Enabled<br>Possible Leak Risk";
-            elements.webrtcStatus.style.color = "#eab308";
-        }
-    } catch (e) {
-        console.error(e);
-        elements.webrtcStatus.innerHTML = "❌ Cannot Block WebRTC<br>Try restarting Chrome";
-        elements.webrtcStatus.style.color = "#ef4444";
-    }
-}
-
-// Check IP
 async function checkIP() {
     try {
         elements.status.textContent = "Fetching your IP...";
@@ -68,17 +38,16 @@ async function checkIP() {
         console.error(err);
         elements.status.textContent = "❌ Connection Error";
         elements.status.style.background = "#ef4444";
-        elements.ip.textContent = "Error";
     } finally {
         elements.checkBtn.disabled = false;
     }
 }
 
-// Get IP Details
 async function getIPDetails(ip) {
     const apis = [
         `https://ipapi.co/${ip}/json/`,
-        `https://ipinfo.io/${ip}/json`
+        `https://ipinfo.io/${ip}/json`,
+        `https://freeipapi.com/api/json/${ip}`
     ];
 
     for (let url of apis) {
@@ -92,7 +61,7 @@ async function getIPDetails(ip) {
                 countryCode: data.country_code || data.country || '',
                 city: data.city || data.region || 'Unknown',
                 isp: data.org || data.isp || 'Unknown',
-                type: data.hosting ? "Data Center" : (data.proxy ? "Proxy / VPN" : "Residential")
+                type: data.hosting ? "Data Center" : (da                                            1ta.proxy ? "Proxy / VPN" : "Residential")
             };
         } catch (e) {}
     }
@@ -104,17 +73,31 @@ function getCountryFlag(code) {
     return String.fromCodePoint(...[...code.toUpperCase()].map(c => 127397 + c.charCodeAt(0)));
 }
 
-// Event Listeners
-elements.checkBtn.addEventListener('click', checkIP);
-
+// WebRTC Toggle (فقط UI)
 elements.webrtcToggle.addEventListener('change', () => {
     const enabled = elements.webrtcToggle.checked;
     chrome.storage.local.set({ webrtcBlocked: enabled });
-    applyWebRTCBlock(enabled);
+
+    if (enabled) {
+        elements.webrtcStatus.innerHTML = "🛡️ WebRTC Blocked<br>Protection Active";
+        elements.webrtcStatus.style.color = "#22c55e";
+    } else {
+        elements.webrtcStatus.innerHTML = "⚠️ WebRTC Enabled<br>Possible Leak Risk";
+        elements.webrtcStatus.style.color = "#eab308";
+    }
 });
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    loadSettings();
     checkIP();
+
+    // Load toggle state
+    chrome.storage.local.get('webrtcBlocked', (data) => {
+        const enabled = data.webrtcBlocked || false;
+        elements.webrtcToggle.checked = enabled;
+        if (enabled) {
+            elements.webrtcStatus.innerHTML = "🛡️ WebRTC Blocked<br>Protection Active";
+            elements.webrtcStatus.style.color = "#22c55e";
+        }
+    });
 });
