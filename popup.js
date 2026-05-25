@@ -1,4 +1,3 @@
-// popup.js - IP Guard (نسخه نهایی تمیز)
 const elements = {
     ip: document.getElementById('ip'),
     country: document.getElementById('country'),
@@ -6,8 +5,6 @@ const elements = {
     isp: document.getElementById('isp'),
     type: document.getElementById('type'),
     status: document.getElementById('status'),
-    webrtcStatus: document.getElementById('webrtc-status'),
-    webrtcToggle: document.getElementById('webrtc-toggle'),
     checkBtn: document.getElementById('check-btn')
 };
 
@@ -43,10 +40,11 @@ async function checkIP() {
     }
 }
 
+// Improved detection especially for OVH and hosting
 async function getIPDetails(ip) {
     const apis = [
-        `https://ipapi.co/${ip}/json/`,
         `https://ipinfo.io/${ip}/json`,
+        `https://ipapi.co/${ip}/json/`,
         `https://freeipapi.com/api/json/${ip}`
     ];
 
@@ -56,16 +54,34 @@ async function getIPDetails(ip) {
             if (!res.ok) continue;
             const data = await res.json();
 
+            let isp = data.org || data.isp || data.asn?.name || data.connection?.isp || 'Unknown';
+
+            // Special handling for OVH and popular hosting
+            if (ip.startsWith('51.178.') || ip.startsWith('51.68.') ||
+                ip.startsWith('51.210.') || ip.startsWith('54.36.') ||
+                isp.toLowerCase().includes('ovh')) {
+                isp = "OVH SAS";
+            }
+
+            let type = "Residential";
+            if (data.hosting || data.datacenter || isp.toLowerCase().includes('ovh') ||
+                isp.toLowerCase().includes('hetzner') || isp.toLowerCase().includes('scaleway')) {
+                type = "Data Center";
+            } else if (data.proxy || data.vpn) {
+                type = "Proxy / VPN";
+            }
+
             return {
-                country: data.country_name || data.country || 'Unknown',
+                country: data.country_name || data.country || data.countryName || 'Unknown',
                 countryCode: data.country_code || data.country || '',
-                city: data.city || data.region || 'Unknown',
-                isp: data.org || data.isp || 'Unknown',
-                type: data.hosting ? "Data Center" : (da                                            1ta.proxy ? "Proxy / VPN" : "Residential")
+                city: data.city || data.region || data.cityName || 'Unknown',
+                isp: isp,
+                type: type
             };
         } catch (e) {}
     }
-    return {};
+
+    return { country: 'Unknown', countryCode: '', city: 'Unknown', isp: 'Unknown', type: 'Residential' };
 }
 
 function getCountryFlag(code) {
@@ -73,31 +89,6 @@ function getCountryFlag(code) {
     return String.fromCodePoint(...[...code.toUpperCase()].map(c => 127397 + c.charCodeAt(0)));
 }
 
-// WebRTC Toggle (فقط UI)
-elements.webrtcToggle.addEventListener('change', () => {
-    const enabled = elements.webrtcToggle.checked;
-    chrome.storage.local.set({ webrtcBlocked: enabled });
-
-    if (enabled) {
-        elements.webrtcStatus.innerHTML = "🛡️ WebRTC Blocked<br>Protection Active";
-        elements.webrtcStatus.style.color = "#22c55e";
-    } else {
-        elements.webrtcStatus.innerHTML = "⚠️ WebRTC Enabled<br>Possible Leak Risk";
-        elements.webrtcStatus.style.color = "#eab308";
-    }
-});
-
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    checkIP();
-
-    // Load toggle state
-    chrome.storage.local.get('webrtcBlocked', (data) => {
-        const enabled = data.webrtcBlocked || false;
-        elements.webrtcToggle.checked = enabled;
-        if (enabled) {
-            elements.webrtcStatus.innerHTML = "🛡️ WebRTC Blocked<br>Protection Active";
-            elements.webrtcStatus.style.color = "#22c55e";
-        }
-    });
-});
+// Events
+elements.checkBtn.addEventListener('click', checkIP);
+document.addEventListener('DOMContentLoaded', checkIP);
