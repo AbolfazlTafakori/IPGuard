@@ -25,8 +25,7 @@ A clean, fast, and privacy-focused extension to check your real IP address, dete
 
 ## 📸 Screenshots
 
-![IP Guard Banner]
-![Uploading ChatGPT Image May 25, 2026, 08_37_43 PM (1).png…]()
+<img width="1280" height="800" alt="ChatGPT Image May 25, 2026, 08_37_43 PM (1)" src="https://github.com/user-attachments/assets/79611e3c-4332-46be-8864-02dcccbfa7e3" />
 
 ---
 
