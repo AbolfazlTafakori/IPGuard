@@ -32,7 +32,7 @@ A clean, fast, and privacy-focused extension to check your real IP address, dete
 ## 📥 Installation
 
 ### Chrome Web Store
-[![Available in the Chrome Web Store](https://chromewebstore.google.com/detail/ibcekndipggbdinpiojbbddboekhaaei?utm_source=item-share-cb)
+[![Available in the Chrome Web Store](https://img.shields.io/badge/Available%20in%20Chrome%20Web%20Store-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/ibcekndipggbdinpiojbbddboekhaaei?utm_source=item-share-cb)
 
 ### Manual Installation
 1. Clone or download this repository
