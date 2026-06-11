@@ -85,7 +85,8 @@ async function checkIP() {
         elements.isp.textContent = details.isp || 'Unknown';
         setTypeBadge(details.type || 'Residential');
 
-        setStatus('✓ Checked Successfully', 'success');
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        setStatus(`✓ Live · Last updated ${now}`, 'success');
         saveHistory(ip);
         renderHistory();
 
@@ -459,5 +460,17 @@ elements.monitorToggle.addEventListener('change', async () => {
     updateMonitorUI(enabled);
 });
 
-elements.checkBtn.addEventListener('click', checkIP);
-document.addEventListener('DOMContentLoaded', () => { checkIP(); });
+// ── Auto Refresh ──
+let autoRefreshTimer = null;
+
+function startAutoRefresh() {
+    checkIP();
+    autoRefreshTimer = setInterval(checkIP, 15000);
+}
+
+elements.checkBtn.addEventListener('click', () => {
+    clearInterval(autoRefreshTimer);
+    startAutoRefresh();
+});
+
+document.addEventListener('DOMContentLoaded', startAutoRefresh);
