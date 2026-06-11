@@ -237,6 +237,7 @@ setupCopy(elements.copyBtn6, () => elements.ip6.textContent);
 // ── History ──
 function saveHistory(ip) {
     let history = JSON.parse(localStorage.getItem('ipHistory') || '[]');
+    if (history.length > 0 && history[0].ip === ip) return;
     history = history.filter(e => e.ip !== ip);
     history.unshift({ ip, time: Date.now() });
     history = history.slice(0, 5);
@@ -263,6 +264,14 @@ function collectWebRTCIPs() {
     return new Promise((resolve) => {
         const localIPs = new Set();
         const publicIPs = new Set();
+        let resolved = false;
+
+        function done() {
+            if (resolved) return;
+            resolved = true;
+            pc.close();
+            resolve({ localIPs: [...localIPs], publicIPs: [...publicIPs] });
+        }
 
         const pc = new RTCPeerConnection({
             iceServers: [
@@ -275,11 +284,7 @@ function collectWebRTCIPs() {
         pc.createDataChannel('leak-test');
 
         pc.onicecandidate = (e) => {
-            if (!e.candidate) {
-                pc.close();
-                resolve({ localIPs: [...localIPs], publicIPs: [...publicIPs] });
-                return;
-            }
+            if (!e.candidate) { done(); return; }
 
             const parts = e.candidate.candidate.split(' ');
             const ip = parts[4];
@@ -300,12 +305,9 @@ function collectWebRTCIPs() {
 
         pc.createOffer()
             .then(offer => pc.setLocalDescription(offer))
-            .catch(() => resolve({ localIPs: [], publicIPs: [] }));
+            .catch(() => done());
 
-        setTimeout(() => {
-            pc.close();
-            resolve({ localIPs: [...localIPs], publicIPs: [...publicIPs] });
-        }, 6000);
+        setTimeout(done, 6000);
     });
 }
 
@@ -335,7 +337,7 @@ async function runWebRTCTest() {
             elements.webrtcSub.textContent = 'Your real IP is exposed through WebRTC. Your VPN is NOT fully protecting you.';
             elements.webrtcRealIp.textContent = leakedPublicIPs.join(', ');
             elements.webrtcRealIp.style.color = 'var(--danger)';
-        } else if (publicIPs.size === 0 && localIPs.size === 0) {
+        } else if (publicIPs.length === 0 && localIPs.length === 0) {
             elements.webrtcIcon.textContent = '🛡️';
             elements.webrtcResultText.textContent = 'WebRTC Disabled or Blocked';
             elements.webrtcResultText.className = 'webrtc-result-text safe';
