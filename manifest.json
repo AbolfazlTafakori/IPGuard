@@ -17,6 +17,7 @@
   },
   "host_permissions": [
     "https://api.ipify.org/*",
+    "https://api6.ipify.org/*",
     "https://ipapi.co/*",
     "https://ipinfo.io/*",
     "https://freeipapi.com/*"

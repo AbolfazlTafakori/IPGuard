@@ -1,11 +1,23 @@
 const elements = {
     ip: document.getElementById('ip'),
+    ip6: document.getElementById('ip6'),
+    copyBtn6: document.getElementById('copy-btn6'),
     country: document.getElementById('country'),
     city: document.getElementById('city'),
     isp: document.getElementById('isp'),
     type: document.getElementById('type'),
     status: document.getElementById('status'),
-    checkBtn: document.getElementById('check-btn')
+    checkBtn: document.getElementById('check-btn'),
+    copyBtn: document.getElementById('copy-btn'),
+    historyList: document.getElementById('history-list'),
+    historyEmpty: document.getElementById('history-empty'),
+    pageHome: document.getElementById('page-home'),
+    pageHistory: document.getElementById('page-history'),
+    hamburgerBtn: document.getElementById('hamburger-btn'),
+    sideMenu: document.getElementById('side-menu'),
+    menuOverlay: document.getElementById('menu-overlay'),
+    menuHome: document.getElementById('menu-home'),
+    menuHistory: document.getElementById('menu-history')
 };
 
 let isChecking = false;
@@ -29,12 +41,23 @@ async function checkIP() {
     setStatus('Fetching your IP...', 'loading');
 
     try {
-        const ipRes = await fetch('https://api.ipify.org?format=json');
-        if (!ipRes.ok) throw new Error(`IP fetch failed: ${ipRes.status}`);
-        const { ip } = await ipRes.json();
+        const [ipRes, ip6Res] = await Promise.allSettled([
+            fetch('https://api.ipify.org?format=json'),
+            fetch('https://api6.ipify.org?format=json')
+        ]);
+
+        if (ipRes.status !== 'fulfilled' || !ipRes.value.ok) throw new Error('IP fetch failed');
+        const { ip } = await ipRes.value.json();
         if (!ip) throw new Error('No IP in response');
 
         elements.ip.textContent = ip;
+
+        if (ip6Res.status === 'fulfilled' && ip6Res.value.ok) {
+            const { ip: ip6 } = await ip6Res.value.json();
+            elements.ip6.textContent = ip6 || 'Not available';
+        } else {
+            elements.ip6.textContent = 'Not available';
+        }
 
         const details = await getIPDetails(ip);
 
@@ -45,6 +68,8 @@ async function checkIP() {
         setTypeBadge(details.type || 'Residential');
 
         setStatus('✓ Checked Successfully', 'success');
+        saveHistory(ip);
+        renderHistory();
 
     } catch (err) {
         console.error(err);
@@ -144,5 +169,76 @@ function getCountryFlag(code) {
     return String.fromCodePoint(...[...code.toUpperCase()].map(c => 127397 + c.charCodeAt(0)));
 }
 
+// ── Menu ──
+function openMenu() {
+    elements.sideMenu.classList.add('open');
+    elements.menuOverlay.classList.add('open');
+}
+
+function closeMenu() {
+    elements.sideMenu.classList.remove('open');
+    elements.menuOverlay.classList.remove('open');
+}
+
+function navigateTo(page) {
+    closeMenu();
+    if (page === 'home') {
+        elements.pageHome.style.display = 'block';
+        elements.pageHistory.style.display = 'none';
+        elements.menuHome.classList.add('active');
+        elements.menuHistory.classList.remove('active');
+    } else {
+        elements.pageHome.style.display = 'none';
+        elements.pageHistory.style.display = 'block';
+        elements.menuHome.classList.remove('active');
+        elements.menuHistory.classList.add('active');
+        renderHistory();
+    }
+}
+
+elements.hamburgerBtn.addEventListener('click', openMenu);
+elements.menuOverlay.addEventListener('click', closeMenu);
+elements.menuHome.addEventListener('click', () => navigateTo('home'));
+elements.menuHistory.addEventListener('click', () => navigateTo('history'));
+
+// ── Copy IP ──
+function setupCopy(btn, getVal) {
+    btn.addEventListener('click', () => {
+        const val = getVal();
+        if (!val || val === '---' || val === 'Not available') return;
+        navigator.clipboard.writeText(val).then(() => {
+            btn.classList.add('copied');
+            setTimeout(() => btn.classList.remove('copied'), 1500);
+        });
+    });
+}
+
+setupCopy(elements.copyBtn, () => elements.ip.textContent);
+setupCopy(elements.copyBtn6, () => elements.ip6.textContent);
+
+// ── History ──
+function saveHistory(ip) {
+    let history = JSON.parse(localStorage.getItem('ipHistory') || '[]');
+    history = history.filter(e => e.ip !== ip);
+    history.unshift({ ip, time: Date.now() });
+    history = history.slice(0, 5);
+    localStorage.setItem('ipHistory', JSON.stringify(history));
+}
+
+function renderHistory() {
+    const history = JSON.parse(localStorage.getItem('ipHistory') || '[]');
+    if (history.length === 0) {
+        elements.historyList.innerHTML = '';
+        elements.historyEmpty.style.display = 'block';
+        return;
+    }
+    elements.historyEmpty.style.display = 'none';
+    elements.historyList.innerHTML = history.map(e => {
+        const d = new Date(e.time);
+        const time = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `<div class="history-item"><span class="history-ip">${e.ip}</span><span class="history-time">${time}</span></div>`;
+    }).join('');
+}
+
 elements.checkBtn.addEventListener('click', checkIP);
-document.addEventListener('DOMContentLoaded', checkIP);
+document.addEventListener('DOMContentLoaded', () => { checkIP(); });
