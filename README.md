@@ -2,7 +2,7 @@
 
 **Advanced IP Checker & Privacy Protection Tool for Chrome**
 
-![Version](https://img.shields.io/badge/Version-1.0-blue)
+![Version](https://img.shields.io/badge/Version-1.5-blue)
 ![Chrome](https://img.shields.io/badge/Chrome-Extension-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
@@ -12,10 +12,12 @@ A clean, fast, and privacy-focused extension to check your real IP address, dete
 
 ## ✨ Features
 
-- 🌐 **Real Public IP** detection (IPv4)
+- 🌐 **Real Public IP** detection (IPv4 & IPv6)
 - 📍 Accurate **Country, City, and ISP** information
 - 🔍 **IP Type** detection — Residential / Data Center / Proxy / VPN
 - 🏳️ Country **flag display**
+- 📋 **Copy IP** to clipboard
+- 🕐 **IP History** — last 5 checked IPs
 - 🌙 Clean and modern **Dark Mode UI**
 - ⚡ Fast and lightweight
 - 🔒 **Privacy-first** — no data collection or tracking
@@ -25,14 +27,14 @@ A clean, fast, and privacy-focused extension to check your real IP address, dete
 
 ## 📸 Screenshots
 
-![IP Guard Banner](screenshots/banner.png)
+<img width="1280" height="800" alt="IP Guard Banner" src="https://github.com/user-attachments/assets/79611e3c-4332-46be-8864-02dcccbfa7e3" />
 
 ---
 
 ## 📥 Installation
 
 ### Chrome Web Store
-*(Coming soon)*
+[![Available in the Chrome Web Store](https://img.shields.io/badge/Available%20in%20Chrome%20Web%20Store-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/ibcekndipggbdinpiojbbddboekhaaei?utm_source=item-share-cb)
 
 ### Manual Installation
 1. Clone or download this repository
@@ -62,9 +64,11 @@ A clean, fast, and privacy-focused extension to check your real IP address, dete
 
 ## 🗺️ Roadmap
 
-- [ ] IPv6 detection
+- [x] IPv6 detection
+- [x] Copy IP to clipboard
+- [x] IP History
 - [ ] WebRTC leak detection
-- [ ] Copy IP to clipboard
+- [ ] VPN Monitor / IP Change Alert
 
 ---
 
