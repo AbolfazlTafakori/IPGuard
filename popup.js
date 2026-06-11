@@ -6,10 +6,10 @@ const elements = {
     pageMonitor: document.getElementById('page-monitor'),
     menuMonitor: document.getElementById('menu-monitor'),
     monitorToggle: document.getElementById('monitor-toggle'),
-    monitorInterval: document.getElementById('monitor-interval'),
     monitorIcon: document.getElementById('monitor-icon'),
     monitorStatusText: document.getElementById('monitor-status-text'),
     monitorCurrentIp: document.getElementById('monitor-current-ip'),
+    monitorLastChecked: document.getElementById('monitor-last-checked'),
     menuWebrtc: document.getElementById('menu-webrtc'),
     webrtcBtn: document.getElementById('webrtc-btn'),
     webrtcStatusBox: document.getElementById('webrtc-status-box'),
@@ -420,15 +420,11 @@ elements.webrtcBtn.addEventListener('click', runWebRTCTest);
 
 // ── VPN Monitor ──
 function loadMonitorState() {
-    chrome.storage.local.get(['monitorEnabled', 'monitorInterval', 'lastKnownIP'], (data) => {
-        const enabled = data.monitorEnabled || false;
-        const interval = data.monitorInterval || 5;
-
-        elements.monitorToggle.checked = enabled;
-        elements.monitorInterval.value = interval;
+    chrome.storage.local.get(['monitorEnabled', 'lastKnownIP', 'lastChecked'], (data) => {
+        elements.monitorToggle.checked = data.monitorEnabled || false;
         elements.monitorCurrentIp.textContent = data.lastKnownIP || '---';
-
-        updateMonitorUI(enabled);
+        elements.monitorLastChecked.textContent = data.lastChecked || '---';
+        updateMonitorUI(data.monitorEnabled || false);
     });
 }
 
@@ -446,32 +442,21 @@ function updateMonitorUI(enabled) {
 
 elements.monitorToggle.addEventListener('change', async () => {
     const enabled = elements.monitorToggle.checked;
-    const interval = parseInt(elements.monitorInterval.value);
-
-    await chrome.storage.local.set({ monitorEnabled: enabled, monitorInterval: interval });
+    await chrome.storage.local.set({ monitorEnabled: enabled });
 
     if (enabled) {
-        // save current IP as baseline
         chrome.runtime.sendMessage({ type: 'GET_IP' }, (res) => {
             if (res?.ip) {
                 chrome.storage.local.set({ lastKnownIP: res.ip });
                 elements.monitorCurrentIp.textContent = res.ip;
             }
         });
-        chrome.runtime.sendMessage({ type: 'START_MONITOR', interval });
+        chrome.runtime.sendMessage({ type: 'START_MONITOR' });
     } else {
         chrome.runtime.sendMessage({ type: 'STOP_MONITOR' });
     }
 
     updateMonitorUI(enabled);
-});
-
-elements.monitorInterval.addEventListener('change', () => {
-    if (elements.monitorToggle.checked) {
-        const interval = parseInt(elements.monitorInterval.value);
-        chrome.storage.local.set({ monitorInterval: interval });
-        chrome.runtime.sendMessage({ type: 'START_MONITOR', interval });
-    }
 });
 
 elements.checkBtn.addEventListener('click', checkIP);
