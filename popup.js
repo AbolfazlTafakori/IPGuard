@@ -2,6 +2,17 @@ const elements = {
     ip: document.getElementById('ip'),
     ip6: document.getElementById('ip6'),
     copyBtn6: document.getElementById('copy-btn6'),
+    pageWebrtc: document.getElementById('page-webrtc'),
+    menuWebrtc: document.getElementById('menu-webrtc'),
+    webrtcBtn: document.getElementById('webrtc-btn'),
+    webrtcStatusBox: document.getElementById('webrtc-status-box'),
+    webrtcIcon: document.getElementById('webrtc-icon'),
+    webrtcResultText: document.getElementById('webrtc-result-text'),
+    webrtcSub: document.getElementById('webrtc-sub'),
+    webrtcIps: document.getElementById('webrtc-ips'),
+    webrtcVpnIp: document.getElementById('webrtc-vpn-ip'),
+    webrtcRealIp: document.getElementById('webrtc-real-ip'),
+    webrtcLocalIp: document.getElementById('webrtc-local-ip'),
     country: document.getElementById('country'),
     city: document.getElementById('city'),
     isp: document.getElementById('isp'),
@@ -182,17 +193,24 @@ function closeMenu() {
 
 function navigateTo(page) {
     closeMenu();
+    elements.pageHome.style.display = 'none';
+    elements.pageHistory.style.display = 'none';
+    elements.pageWebrtc.style.display = 'none';
+    elements.menuHome.classList.remove('active');
+    elements.menuHistory.classList.remove('active');
+    elements.menuWebrtc.classList.remove('active');
+
     if (page === 'home') {
         elements.pageHome.style.display = 'block';
-        elements.pageHistory.style.display = 'none';
         elements.menuHome.classList.add('active');
-        elements.menuHistory.classList.remove('active');
-    } else {
-        elements.pageHome.style.display = 'none';
+    } else if (page === 'history') {
         elements.pageHistory.style.display = 'block';
-        elements.menuHome.classList.remove('active');
         elements.menuHistory.classList.add('active');
         renderHistory();
+    } else if (page === 'webrtc') {
+        elements.pageWebrtc.style.display = 'block';
+        elements.menuWebrtc.classList.add('active');
+        loadProtectionState();
     }
 }
 
@@ -200,6 +218,7 @@ elements.hamburgerBtn.addEventListener('click', openMenu);
 elements.menuOverlay.addEventListener('click', closeMenu);
 elements.menuHome.addEventListener('click', () => navigateTo('home'));
 elements.menuHistory.addEventListener('click', () => navigateTo('history'));
+elements.menuWebrtc.addEventListener('click', () => navigateTo('webrtc'));
 
 // ── Copy IP ──
 function setupCopy(btn, getVal) {
@@ -239,6 +258,151 @@ function renderHistory() {
         return `<div class="history-item"><span class="history-ip">${e.ip}</span><span class="history-time">${time}</span></div>`;
     }).join('');
 }
+
+// ── WebRTC Leak Detection ──
+function collectWebRTCIPs() {
+    return new Promise((resolve) => {
+        const localIPs = new Set();
+        const publicIPs = new Set();
+
+        const pc = new RTCPeerConnection({
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' }
+            ]
+        });
+
+        pc.createDataChannel('leak-test');
+
+        pc.onicecandidate = (e) => {
+            if (!e.candidate) {
+                pc.close();
+                resolve({ localIPs: [...localIPs], publicIPs: [...publicIPs] });
+                return;
+            }
+
+            const parts = e.candidate.candidate.split(' ');
+            const ip = parts[4];
+            const type = parts[7]; // host / srflx / relay
+
+            if (!ip) return;
+
+            // filter out mDNS (.local) addresses
+            if (ip.endsWith('.local')) return;
+
+            if (type === 'host') {
+                localIPs.add(ip);
+            } else if (type === 'srflx') {
+                // srflx = server reflexive = real public IP via STUN
+                publicIPs.add(ip);
+                // also pick related address (raddr) which is sometimes the real IP
+                const raddrIndex = parts.indexOf('raddr');
+                if (raddrIndex !== -1 && parts[raddrIndex + 1]) {
+                    publicIPs.add(parts[raddrIndex + 1]);
+                }
+            }
+        };
+
+        pc.createOffer()
+            .then(offer => pc.setLocalDescription(offer))
+            .catch(() => resolve({ localIPs: [], publicIPs: [] }));
+
+        // fallback timeout — some browsers don't fire null candidate
+        setTimeout(() => {
+            pc.close();
+            resolve({ localIPs: [...localIPs], publicIPs: [...publicIPs] });
+        }, 6000);
+    });
+}
+
+async function runWebRTCTest() {
+    elements.webrtcBtn.disabled = true;
+    elements.webrtcIcon.textContent = '🔍';
+    elements.webrtcResultText.textContent = 'Testing...';
+    elements.webrtcResultText.className = 'webrtc-result-text';
+    elements.webrtcSub.textContent = 'Collecting ICE candidates via STUN...';
+    elements.webrtcIps.style.display = 'none';
+
+    try {
+        const currentIP = elements.ip.textContent;
+        const { localIPs, publicIPs } = await collectWebRTCIPs();
+
+        // public IPs detected by WebRTC — filter out the VPN IP and private ranges
+        const privateRanges = /^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|127\.|169\.254\.|fc|fd|fe80)/i;
+        const leakedPublicIPs = publicIPs.filter(ip =>
+            !privateRanges.test(ip) && ip !== currentIP
+        );
+        const localOnly = localIPs.filter(ip => privateRanges.test(ip));
+
+        elements.webrtcVpnIp.textContent = currentIP !== '---' ? currentIP : 'Unknown';
+        elements.webrtcLocalIp.textContent = localOnly.length > 0 ? localOnly.join(', ') : 'None detected';
+
+        if (leakedPublicIPs.length > 0) {
+            // LEAK DETECTED
+            elements.webrtcIcon.textContent = '🚨';
+            elements.webrtcResultText.textContent = 'WebRTC Leak Detected!';
+            elements.webrtcResultText.className = 'webrtc-result-text leak';
+            elements.webrtcSub.textContent = 'Your real IP is exposed through WebRTC. Your VPN is NOT fully protecting you.';
+            elements.webrtcRealIp.textContent = leakedPublicIPs.join(', ');
+            elements.webrtcRealIp.style.color = 'var(--danger)';
+        } else if (publicIPs.size === 0 && localIPs.size === 0) {
+            // WebRTC might be disabled
+            elements.webrtcIcon.textContent = '🛡️';
+            elements.webrtcResultText.textContent = 'WebRTC Disabled or Blocked';
+            elements.webrtcResultText.className = 'webrtc-result-text safe';
+            elements.webrtcSub.textContent = 'No IP was exposed. WebRTC may be disabled in your browser settings.';
+            elements.webrtcRealIp.textContent = 'None';
+            elements.webrtcRealIp.style.color = 'var(--success)';
+        } else {
+            // NO LEAK
+            elements.webrtcIcon.textContent = '✅';
+            elements.webrtcResultText.textContent = 'No WebRTC Leak';
+            elements.webrtcResultText.className = 'webrtc-result-text safe';
+            elements.webrtcSub.textContent = 'Your real IP is not exposed through WebRTC. You are protected.';
+            elements.webrtcRealIp.textContent = currentIP;
+            elements.webrtcRealIp.style.color = 'var(--success)';
+        }
+
+        elements.webrtcIps.style.display = 'block';
+
+    } catch (err) {
+        console.error(err);
+        elements.webrtcIcon.textContent = '❌';
+        elements.webrtcResultText.textContent = 'Test Failed';
+        elements.webrtcSub.textContent = 'Could not run the WebRTC test. Please try again.';
+    } finally {
+        elements.webrtcBtn.disabled = false;
+    }
+}
+
+// ── WebRTC Protection Toggle ──
+const toggle = document.getElementById('webrtc-protect-toggle');
+
+function applyWebRTCPolicy(protect) {
+    const policy = protect ? 'disable_non_proxied_udp' : 'default';
+    chrome.privacy.network.webRTCIPHandlingPolicy.set(
+        { value: policy, scope: 'regular' },
+        () => {
+            if (chrome.runtime.lastError) {
+                console.warn('WebRTC policy error:', chrome.runtime.lastError.message);
+            }
+        }
+    );
+}
+
+function loadProtectionState() {
+    chrome.privacy.network.webRTCIPHandlingPolicy.get({}, (details) => {
+        const isProtected = details.value === 'disable_non_proxied_udp';
+        toggle.checked = isProtected;
+    });
+}
+
+toggle.addEventListener('change', () => {
+    applyWebRTCPolicy(toggle.checked);
+});
+
+elements.webrtcBtn.addEventListener('click', runWebRTCTest);
 
 elements.checkBtn.addEventListener('click', checkIP);
 document.addEventListener('DOMContentLoaded', () => { checkIP(); });

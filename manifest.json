@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "IP Guard",
   "description": "Check your real IP address and protect your privacy",
-  "version": "1.0",
+  "version": "2.0",
   "icons": {
     "16": "icons/icon-16.png",
     "48": "icons/icon-48.png",
@@ -15,6 +15,9 @@
   "background": {
     "service_worker": "background.js"
   },
+  "permissions": [
+    "privacy"
+  ],
   "host_permissions": [
     "https://api.ipify.org/*",
     "https://api6.ipify.org/*",

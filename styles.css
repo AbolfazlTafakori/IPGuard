@@ -431,6 +431,120 @@ body {
     cursor: not-allowed;
 }
 
+/* ── WebRTC Page ── */
+.webrtc-status-box {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 24px 16px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.webrtc-icon {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
+
+.webrtc-result-text {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+
+.webrtc-result-text.leak {
+    color: var(--danger);
+}
+
+.webrtc-result-text.safe {
+    color: var(--success);
+}
+
+.webrtc-sub {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.webrtc-ips {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 4px 16px;
+    margin-bottom: 12px;
+}
+
+.wrtc-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    gap: 8px;
+}
+
+.wrtc-row:last-child { border-bottom: none; }
+
+/* ── WebRTC Protection Toggle ── */
+.protect-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+}
+
+.protect-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 3px;
+}
+
+.protect-sub {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 46px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: #334155;
+    border-radius: 50px;
+    transition: background 0.3s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+input:checked + .slider { background: var(--success); }
+input:checked + .slider:before { transform: translateX(20px); }
+
 /* ── Footer ── */
 .footer {
     text-align: center;

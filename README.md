@@ -2,7 +2,7 @@
 
 **Advanced IP Checker & Privacy Protection Tool for Chrome**
 
-![Version](https://img.shields.io/badge/Version-1.5-blue)
+![Version](https://img.shields.io/badge/Version-2.0-blue)
 ![Chrome](https://img.shields.io/badge/Chrome-Extension-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
@@ -18,6 +18,8 @@ A clean, fast, and privacy-focused extension to check your real IP address, dete
 - 🏳️ Country **flag display**
 - 📋 **Copy IP** to clipboard
 - 🕐 **IP History** — last 5 checked IPs
+- 🛡️ **WebRTC Leak Detection** — test if your real IP is exposed
+- 🔒 **WebRTC Protection** — block WebRTC leaks while keeping WebRTC functional
 - 🌙 Clean and modern **Dark Mode UI**
 - ⚡ Fast and lightweight
 - 🔒 **Privacy-first** — no data collection or tracking
@@ -67,7 +69,8 @@ A clean, fast, and privacy-focused extension to check your real IP address, dete
 - [x] IPv6 detection
 - [x] Copy IP to clipboard
 - [x] IP History
-- [ ] WebRTC leak detection
+- [x] WebRTC leak detection
+- [x] WebRTC Protection (block leaks)
 - [ ] VPN Monitor / IP Change Alert
 
 ---
