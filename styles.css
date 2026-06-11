@@ -545,6 +545,20 @@ body {
 input:checked + .slider { background: var(--success); }
 input:checked + .slider:before { transform: translateX(20px); }
 
+/* ── Interval Select ── */
+.interval-select {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 6px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    outline: none;
+}
+
+.interval-select:focus { border-color: var(--primary); }
+
 /* ── Footer ── */
 .footer {
     text-align: center;

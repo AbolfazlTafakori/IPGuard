@@ -3,6 +3,13 @@ const elements = {
     ip6: document.getElementById('ip6'),
     copyBtn6: document.getElementById('copy-btn6'),
     pageWebrtc: document.getElementById('page-webrtc'),
+    pageMonitor: document.getElementById('page-monitor'),
+    menuMonitor: document.getElementById('menu-monitor'),
+    monitorToggle: document.getElementById('monitor-toggle'),
+    monitorInterval: document.getElementById('monitor-interval'),
+    monitorIcon: document.getElementById('monitor-icon'),
+    monitorStatusText: document.getElementById('monitor-status-text'),
+    monitorCurrentIp: document.getElementById('monitor-current-ip'),
     menuWebrtc: document.getElementById('menu-webrtc'),
     webrtcBtn: document.getElementById('webrtc-btn'),
     webrtcStatusBox: document.getElementById('webrtc-status-box'),
@@ -196,9 +203,11 @@ function navigateTo(page) {
     elements.pageHome.style.display = 'none';
     elements.pageHistory.style.display = 'none';
     elements.pageWebrtc.style.display = 'none';
+    elements.pageMonitor.style.display = 'none';
     elements.menuHome.classList.remove('active');
     elements.menuHistory.classList.remove('active');
     elements.menuWebrtc.classList.remove('active');
+    elements.menuMonitor.classList.remove('active');
 
     if (page === 'home') {
         elements.pageHome.style.display = 'block';
@@ -211,6 +220,10 @@ function navigateTo(page) {
         elements.pageWebrtc.style.display = 'block';
         elements.menuWebrtc.classList.add('active');
         loadProtectionState();
+    } else if (page === 'monitor') {
+        elements.pageMonitor.style.display = 'block';
+        elements.menuMonitor.classList.add('active');
+        loadMonitorState();
     }
 }
 
@@ -219,6 +232,7 @@ elements.menuOverlay.addEventListener('click', closeMenu);
 elements.menuHome.addEventListener('click', () => navigateTo('home'));
 elements.menuHistory.addEventListener('click', () => navigateTo('history'));
 elements.menuWebrtc.addEventListener('click', () => navigateTo('webrtc'));
+elements.menuMonitor.addEventListener('click', () => navigateTo('monitor'));
 
 // ── Copy IP ──
 function setupCopy(btn, getVal) {
@@ -403,6 +417,62 @@ toggle.addEventListener('change', () => {
 });
 
 elements.webrtcBtn.addEventListener('click', runWebRTCTest);
+
+// ── VPN Monitor ──
+function loadMonitorState() {
+    chrome.storage.local.get(['monitorEnabled', 'monitorInterval', 'lastKnownIP'], (data) => {
+        const enabled = data.monitorEnabled || false;
+        const interval = data.monitorInterval || 5;
+
+        elements.monitorToggle.checked = enabled;
+        elements.monitorInterval.value = interval;
+        elements.monitorCurrentIp.textContent = data.lastKnownIP || '---';
+
+        updateMonitorUI(enabled);
+    });
+}
+
+function updateMonitorUI(enabled) {
+    if (enabled) {
+        elements.monitorIcon.textContent = '🟢';
+        elements.monitorStatusText.textContent = 'Monitor is active';
+        elements.monitorStatusText.style.color = 'var(--success)';
+    } else {
+        elements.monitorIcon.textContent = '🔔';
+        elements.monitorStatusText.textContent = 'Monitor is off';
+        elements.monitorStatusText.style.color = 'var(--text)';
+    }
+}
+
+elements.monitorToggle.addEventListener('change', async () => {
+    const enabled = elements.monitorToggle.checked;
+    const interval = parseInt(elements.monitorInterval.value);
+
+    await chrome.storage.local.set({ monitorEnabled: enabled, monitorInterval: interval });
+
+    if (enabled) {
+        // save current IP as baseline
+        chrome.runtime.sendMessage({ type: 'GET_IP' }, (res) => {
+            if (res?.ip) {
+                chrome.storage.local.set({ lastKnownIP: res.ip });
+                elements.monitorCurrentIp.textContent = res.ip;
+            }
+        });
+        chrome.runtime.sendMessage({ type: 'START_MONITOR', interval });
+    } else {
+        chrome.runtime.sendMessage({ type: 'STOP_MONITOR' });
+    }
+
+    updateMonitorUI(enabled);
+});
+
+elements.monitorInterval.addEventListener('change', () => {
+    if (elements.monitorToggle.checked) {
+        const interval = parseInt(elements.monitorInterval.value);
+        chrome.storage.local.set({ monitorInterval: interval });
+        chrome.runtime.sendMessage({ type: 'START_MONITOR', interval });
+    }
+});
 
 elements.checkBtn.addEventListener('click', checkIP);
 document.addEventListener('DOMContentLoaded', () => { checkIP(); });
