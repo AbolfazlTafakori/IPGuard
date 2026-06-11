@@ -16,10 +16,7 @@
     "service_worker": "background.js"
   },
   "permissions": [
-    "privacy",
-    "alarms",
-    "notifications",
-    "storage"
+    "privacy"
   ],
   "host_permissions": [
     "https://api.ipify.org/*",

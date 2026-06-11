@@ -31,10 +31,6 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         WebRTC Leak
     </div>
-    <div class="menu-item" id="menu-monitor">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        VPN Monitor
-    </div>
 </div>
 
 <!-- Home Page -->
@@ -131,38 +127,6 @@
     <button id="webrtc-btn" class="check-btn" style="margin-top:4px">Run Leak Test</button>
 </div>
 
-<!-- VPN Monitor Page -->
-<div id="page-monitor" style="display:none">
-    <div class="history-header">VPN Monitor</div>
-
-    <div class="monitor-status-box" id="monitor-status-box">
-        <div class="webrtc-icon" id="monitor-icon">🔔</div>
-        <div class="webrtc-result-text" id="monitor-status-text">Monitor is off</div>
-        <div class="webrtc-sub">You will get a notification if your IP changes</div>
-    </div>
-
-    <div class="webrtc-ips">
-        <div class="wrtc-row">
-            <span class="detail-label">Current IP:</span>
-            <span id="monitor-current-ip" class="detail-value">---</span>
-        </div>
-        <div class="wrtc-row">
-            <span class="detail-label">Last check:</span>
-            <span id="monitor-last-checked" class="detail-value">---</span>
-        </div>
-    </div>
-
-    <div class="protect-box" style="margin-bottom:12px">
-        <div class="protect-info">
-            <div class="protect-title">Enable VPN Monitor</div>
-            <div class="protect-sub">Notify me when my IP changes</div>
-        </div>
-        <label class="toggle-switch">
-            <input type="checkbox" id="monitor-toggle">
-            <span class="slider"></span>
-        </label>
-    </div>
-</div>
 
 <div class="footer">
     Made with ❤️ by

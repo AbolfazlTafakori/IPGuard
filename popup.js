@@ -3,16 +3,8 @@ const elements = {
     ip6: document.getElementById('ip6'),
     copyBtn6: document.getElementById('copy-btn6'),
     pageWebrtc: document.getElementById('page-webrtc'),
-    pageMonitor: document.getElementById('page-monitor'),
-    menuMonitor: document.getElementById('menu-monitor'),
-    monitorToggle: document.getElementById('monitor-toggle'),
-    monitorIcon: document.getElementById('monitor-icon'),
-    monitorStatusText: document.getElementById('monitor-status-text'),
-    monitorCurrentIp: document.getElementById('monitor-current-ip'),
-    monitorLastChecked: document.getElementById('monitor-last-checked'),
     menuWebrtc: document.getElementById('menu-webrtc'),
     webrtcBtn: document.getElementById('webrtc-btn'),
-    webrtcStatusBox: document.getElementById('webrtc-status-box'),
     webrtcIcon: document.getElementById('webrtc-icon'),
     webrtcResultText: document.getElementById('webrtc-result-text'),
     webrtcSub: document.getElementById('webrtc-sub'),
@@ -101,7 +93,6 @@ async function checkIP() {
 }
 
 async function getIPDetails(ip) {
-    // Each entry: [url, parser function]
     const apis = [
         [
             `https://ipapi.co/${ip}/json/`,
@@ -204,11 +195,9 @@ function navigateTo(page) {
     elements.pageHome.style.display = 'none';
     elements.pageHistory.style.display = 'none';
     elements.pageWebrtc.style.display = 'none';
-    elements.pageMonitor.style.display = 'none';
     elements.menuHome.classList.remove('active');
     elements.menuHistory.classList.remove('active');
     elements.menuWebrtc.classList.remove('active');
-    elements.menuMonitor.classList.remove('active');
 
     if (page === 'home') {
         elements.pageHome.style.display = 'block';
@@ -221,10 +210,6 @@ function navigateTo(page) {
         elements.pageWebrtc.style.display = 'block';
         elements.menuWebrtc.classList.add('active');
         loadProtectionState();
-    } else if (page === 'monitor') {
-        elements.pageMonitor.style.display = 'block';
-        elements.menuMonitor.classList.add('active');
-        loadMonitorState();
     }
 }
 
@@ -233,7 +218,6 @@ elements.menuOverlay.addEventListener('click', closeMenu);
 elements.menuHome.addEventListener('click', () => navigateTo('home'));
 elements.menuHistory.addEventListener('click', () => navigateTo('history'));
 elements.menuWebrtc.addEventListener('click', () => navigateTo('webrtc'));
-elements.menuMonitor.addEventListener('click', () => navigateTo('monitor'));
 
 // ── Copy IP ──
 function setupCopy(btn, getVal) {
@@ -299,19 +283,14 @@ function collectWebRTCIPs() {
 
             const parts = e.candidate.candidate.split(' ');
             const ip = parts[4];
-            const type = parts[7]; // host / srflx / relay
+            const type = parts[7];
 
-            if (!ip) return;
-
-            // filter out mDNS (.local) addresses
-            if (ip.endsWith('.local')) return;
+            if (!ip || ip.endsWith('.local')) return;
 
             if (type === 'host') {
                 localIPs.add(ip);
             } else if (type === 'srflx') {
-                // srflx = server reflexive = real public IP via STUN
                 publicIPs.add(ip);
-                // also pick related address (raddr) which is sometimes the real IP
                 const raddrIndex = parts.indexOf('raddr');
                 if (raddrIndex !== -1 && parts[raddrIndex + 1]) {
                     publicIPs.add(parts[raddrIndex + 1]);
@@ -323,7 +302,6 @@ function collectWebRTCIPs() {
             .then(offer => pc.setLocalDescription(offer))
             .catch(() => resolve({ localIPs: [], publicIPs: [] }));
 
-        // fallback timeout — some browsers don't fire null candidate
         setTimeout(() => {
             pc.close();
             resolve({ localIPs: [...localIPs], publicIPs: [...publicIPs] });
@@ -343,18 +321,14 @@ async function runWebRTCTest() {
         const currentIP = elements.ip.textContent;
         const { localIPs, publicIPs } = await collectWebRTCIPs();
 
-        // public IPs detected by WebRTC — filter out the VPN IP and private ranges
         const privateRanges = /^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|127\.|169\.254\.|fc|fd|fe80)/i;
-        const leakedPublicIPs = publicIPs.filter(ip =>
-            !privateRanges.test(ip) && ip !== currentIP
-        );
+        const leakedPublicIPs = publicIPs.filter(ip => !privateRanges.test(ip) && ip !== currentIP);
         const localOnly = localIPs.filter(ip => privateRanges.test(ip));
 
         elements.webrtcVpnIp.textContent = currentIP !== '---' ? currentIP : 'Unknown';
         elements.webrtcLocalIp.textContent = localOnly.length > 0 ? localOnly.join(', ') : 'None detected';
 
         if (leakedPublicIPs.length > 0) {
-            // LEAK DETECTED
             elements.webrtcIcon.textContent = '🚨';
             elements.webrtcResultText.textContent = 'WebRTC Leak Detected!';
             elements.webrtcResultText.className = 'webrtc-result-text leak';
@@ -362,7 +336,6 @@ async function runWebRTCTest() {
             elements.webrtcRealIp.textContent = leakedPublicIPs.join(', ');
             elements.webrtcRealIp.style.color = 'var(--danger)';
         } else if (publicIPs.size === 0 && localIPs.size === 0) {
-            // WebRTC might be disabled
             elements.webrtcIcon.textContent = '🛡️';
             elements.webrtcResultText.textContent = 'WebRTC Disabled or Blocked';
             elements.webrtcResultText.className = 'webrtc-result-text safe';
@@ -370,7 +343,6 @@ async function runWebRTCTest() {
             elements.webrtcRealIp.textContent = 'None';
             elements.webrtcRealIp.style.color = 'var(--success)';
         } else {
-            // NO LEAK
             elements.webrtcIcon.textContent = '✅';
             elements.webrtcResultText.textContent = 'No WebRTC Leak';
             elements.webrtcResultText.className = 'webrtc-result-text safe';
@@ -398,67 +370,18 @@ function applyWebRTCPolicy(protect) {
     const policy = protect ? 'disable_non_proxied_udp' : 'default';
     chrome.privacy.network.webRTCIPHandlingPolicy.set(
         { value: policy, scope: 'regular' },
-        () => {
-            if (chrome.runtime.lastError) {
-                console.warn('WebRTC policy error:', chrome.runtime.lastError.message);
-            }
-        }
+        () => { if (chrome.runtime.lastError) console.warn('WebRTC policy error:', chrome.runtime.lastError.message); }
     );
 }
 
 function loadProtectionState() {
     chrome.privacy.network.webRTCIPHandlingPolicy.get({}, (details) => {
-        const isProtected = details.value === 'disable_non_proxied_udp';
-        toggle.checked = isProtected;
+        toggle.checked = details.value === 'disable_non_proxied_udp';
     });
 }
 
-toggle.addEventListener('change', () => {
-    applyWebRTCPolicy(toggle.checked);
-});
-
+toggle.addEventListener('change', () => { applyWebRTCPolicy(toggle.checked); });
 elements.webrtcBtn.addEventListener('click', runWebRTCTest);
-
-// ── VPN Monitor ──
-function loadMonitorState() {
-    chrome.storage.local.get(['monitorEnabled', 'lastKnownIP', 'lastChecked'], (data) => {
-        elements.monitorToggle.checked = data.monitorEnabled || false;
-        elements.monitorCurrentIp.textContent = data.lastKnownIP || '---';
-        elements.monitorLastChecked.textContent = data.lastChecked || '---';
-        updateMonitorUI(data.monitorEnabled || false);
-    });
-}
-
-function updateMonitorUI(enabled) {
-    if (enabled) {
-        elements.monitorIcon.textContent = '🟢';
-        elements.monitorStatusText.textContent = 'Monitor is active';
-        elements.monitorStatusText.style.color = 'var(--success)';
-    } else {
-        elements.monitorIcon.textContent = '🔔';
-        elements.monitorStatusText.textContent = 'Monitor is off';
-        elements.monitorStatusText.style.color = 'var(--text)';
-    }
-}
-
-elements.monitorToggle.addEventListener('change', async () => {
-    const enabled = elements.monitorToggle.checked;
-    await chrome.storage.local.set({ monitorEnabled: enabled });
-
-    if (enabled) {
-        chrome.runtime.sendMessage({ type: 'GET_IP' }, (res) => {
-            if (res?.ip) {
-                chrome.storage.local.set({ lastKnownIP: res.ip });
-                elements.monitorCurrentIp.textContent = res.ip;
-            }
-        });
-        chrome.runtime.sendMessage({ type: 'START_MONITOR' });
-    } else {
-        chrome.runtime.sendMessage({ type: 'STOP_MONITOR' });
-    }
-
-    updateMonitorUI(enabled);
-});
 
 // ── Auto Refresh ──
 let autoRefreshTimer = null;
