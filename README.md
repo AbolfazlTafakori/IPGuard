@@ -66,12 +66,15 @@ A clean, fast, and privacy-focused extension to check your real IP address, dete
 
 ## 🗺️ Roadmap
 
-- [x] IPv6 detection
+- [x] IPv4 & IPv6 detection
 - [x] Copy IP to clipboard
 - [x] IP History
 - [x] WebRTC leak detection
 - [x] WebRTC Protection (block leaks)
+- [x] Live auto-refresh (every 15 seconds)
 - [ ] VPN Monitor / IP Change Alert
+- [ ] DNS Leak Detection
+- [ ] WHOIS Lookup
 
 ---
 
