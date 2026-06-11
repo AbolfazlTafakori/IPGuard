@@ -72,9 +72,15 @@ A clean, fast, and privacy-focused extension to check your real IP address, dete
 - [x] WebRTC leak detection
 - [x] WebRTC Protection (block leaks)
 - [x] Live auto-refresh (every 15 seconds)
-- [ ] VPN Monitor / IP Change Alert
-- [ ] DNS Leak Detection
-- [ ] WHOIS Lookup
+
+**Upcoming:**
+- [ ] VPN Monitor — notify when IP changes (VPN disconnected)
+- [ ] DNS Leak Detection — check if DNS requests bypass VPN
+- [ ] WHOIS Lookup — domain & IP ownership info
+- [ ] Ping & Latency — measure connection speed
+- [ ] Blacklist Check — see if your IP is blacklisted
+- [ ] Geolocation Map — show IP location on a map
+- [ ] Multi-language support
 
 ---
 
