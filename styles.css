@@ -598,4 +598,74 @@ input:checked + .slider:before {
 
 .footer a:hover {
     text-decoration: underline;
-}
+}
+
+/* ── Menu Divider & Language Selector ── */
+.menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 14px 16px;
+}
+
+.menu-lang-box {
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.menu-lang-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.lang-dropdown {
+    width: 100%;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.lang-dropdown:focus {
+    border-color: var(--primary);
+}
+
+/* ── RTL Support ── */
+[dir="rtl"] {
+    font-family: 'Segoe UI', Tahoma, 'Vazirmatn', -apple-system, sans-serif;
+}
+
+[dir="rtl"] .side-menu {
+    left: auto;
+    right: -220px;
+    border-right: none;
+    border-left: 1px solid var(--border);
+    transition: right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.4);
+}
+
+[dir="rtl"] .side-menu.open {
+    right: 0;
+    left: auto;
+}
+
+[dir="rtl"] .menu-item.active {
+    border-left: none;
+    border-right: 3px solid var(--primary);
+}
+
+[dir="rtl"] input:checked + .slider:before {
+    transform: translateX(-20px);
+}
+

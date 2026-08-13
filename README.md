@@ -76,10 +76,10 @@ A clean, fast, and privacy-focused extension to check your real IP address, dete
 - [x] Ping & Latency measurement
 - [x] Background country badge
 - [x] IP History log with clear option
+- [x] Multi-language support (English & Persian)
 - [ ] VPN Disconnect Desktop Notification
 - [ ] WHOIS Lookup
 - [ ] Geolocation Map View
-- [ ] Multi-language support
 
 ---
 

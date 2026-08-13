@@ -25,28 +25,41 @@
 <div class="side-menu" id="side-menu">
     <div class="menu-item active" id="menu-home">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Home
+        <span data-i18n="menuHome">Home</span>
     </div>
     <div class="menu-item" id="menu-webrtc">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        WebRTC Leak
+        <span data-i18n="menuWebrtc">WebRTC Leak</span>
     </div>
     <div class="menu-item" id="menu-dns">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-        DNS Leak
+        <span data-i18n="menuDns">DNS Leak</span>
     </div>
     <div class="menu-item" id="menu-history">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        IP History
+        <span data-i18n="menuHistory">IP History</span>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <div class="menu-lang-box">
+        <div class="menu-lang-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span data-i18n="langLabel">Language</span>
+        </div>
+        <select id="lang-select" class="lang-dropdown">
+            <option value="en">English (EN)</option>
+            <option value="fa">فارسی (FA)</option>
+        </select>
     </div>
 </div>
 
 <!-- Home Page -->
 <div id="page-home">
-    <div id="status" class="status status-ready">Ready to check</div>
+    <div id="status" class="status status-ready" data-i18n="statusReady">Ready to check</div>
 
     <div class="info-box">
-        <div class="info-box-label">Your IP Address</div>
+        <div class="info-box-label" data-i18n="yourIpAddress">Your IP Address</div>
         <div class="ip-inline-row">
             <span class="ip-label">IPv4</span>
             <span id="ip" class="ip-value">---</span>
@@ -69,44 +82,44 @@
 
     <div class="details">
         <div class="detail-row">
-            <span class="detail-label">Country:</span>
+            <span class="detail-label" data-i18n="labelCountry">Country:</span>
             <span id="country" class="detail-value">---</span>
         </div>
         <div class="detail-row">
-            <span class="detail-label">City:</span>
+            <span class="detail-label" data-i18n="labelCity">City:</span>
             <span id="city" class="detail-value">---</span>
         </div>
         <div class="detail-row">
-            <span class="detail-label">ISP:</span>
+            <span class="detail-label" data-i18n="labelIsp">ISP:</span>
             <span id="isp" class="detail-value">---</span>
         </div>
         <div class="detail-row">
-            <span class="detail-label">ASN:</span>
+            <span class="detail-label" data-i18n="labelAsn">ASN:</span>
             <span id="asn" class="detail-value">---</span>
         </div>
         <div class="detail-row">
-            <span class="detail-label">Type:</span>
+            <span class="detail-label" data-i18n="labelType">Type:</span>
             <span id="type" class="detail-value">---</span>
         </div>
         <div class="detail-row">
-            <span class="detail-label">Timezone:</span>
+            <span class="detail-label" data-i18n="labelTimezone">Timezone:</span>
             <span id="timezone" class="detail-value">---</span>
         </div>
         <div class="detail-row">
-            <span class="detail-label">Ping:</span>
+            <span class="detail-label" data-i18n="labelPing">Ping:</span>
             <span id="ping" class="detail-value">---</span>
         </div>
     </div>
 
-    <button id="check-btn" class="check-btn">Check IP Now</button>
+    <button id="check-btn" class="check-btn" data-i18n="btnCheckIp">Check IP Now</button>
 </div>
 
 <!-- WebRTC Leak Page -->
 <div id="page-webrtc" style="display:none">
     <div class="protect-box">
         <div class="protect-info">
-            <div class="protect-title">WebRTC Protection</div>
-            <div class="protect-sub">Prevent real IP leaks by routing non-proxied WebRTC UDP traffic</div>
+            <div class="protect-title" data-i18n="protectTitle">WebRTC Protection</div>
+            <div class="protect-sub" data-i18n="protectSub">Prevent real IP leaks by routing non-proxied WebRTC UDP traffic</div>
         </div>
         <label class="toggle-switch">
             <input type="checkbox" id="webrtc-protect-toggle">
@@ -116,74 +129,74 @@
 
     <div class="webrtc-status-box" id="webrtc-status-box">
         <div class="webrtc-icon" id="webrtc-icon">🔍</div>
-        <div class="webrtc-result-text" id="webrtc-result-text">Press the button to test</div>
-        <div class="webrtc-sub" id="webrtc-sub">WebRTC can expose your real local and public IP even behind VPN</div>
+        <div class="webrtc-result-text" id="webrtc-result-text" data-i18n="webrtcResultReady">Press the button to test</div>
+        <div class="webrtc-sub" id="webrtc-sub" data-i18n="webrtcSubReady">WebRTC can expose your real local and public IP even behind VPN</div>
     </div>
 
     <div class="webrtc-ips" id="webrtc-ips" style="display:none">
         <div class="wrtc-row">
-            <span class="detail-label">Public IP:</span>
+            <span class="detail-label" data-i18n="labelPublicIp">Public IP:</span>
             <span id="webrtc-vpn-ip" class="detail-value">---</span>
         </div>
         <div class="wrtc-row">
-            <span class="detail-label">WebRTC IP:</span>
+            <span class="detail-label" data-i18n="labelWebrtcIp">WebRTC IP:</span>
             <span id="webrtc-real-ip" class="detail-value">---</span>
         </div>
         <div class="wrtc-row">
-            <span class="detail-label">Local IP:</span>
+            <span class="detail-label" data-i18n="labelLocalIp">Local IP:</span>
             <span id="webrtc-local-ip" class="detail-value">---</span>
         </div>
         <div class="wrtc-row">
-            <span class="detail-label">Candidates:</span>
+            <span class="detail-label" data-i18n="labelCandidates">Candidates:</span>
             <span id="webrtc-candidates-count" class="detail-value">0</span>
         </div>
     </div>
 
-    <button id="webrtc-btn" class="check-btn" style="margin-top:8px">Run WebRTC Leak Test</button>
+    <button id="webrtc-btn" class="check-btn" style="margin-top:8px" data-i18n="btnRunWebrtc">Run WebRTC Leak Test</button>
 </div>
 
 <!-- DNS Leak Page -->
 <div id="page-dns" style="display:none">
     <div class="webrtc-status-box" id="dns-status-box">
         <div class="webrtc-icon" id="dns-icon">🌐</div>
-        <div class="webrtc-result-text" id="dns-result-text">DNS Leak Test</div>
-        <div class="webrtc-sub" id="dns-sub">Check if DNS queries bypass your VPN and leak your true ISP</div>
+        <div class="webrtc-result-text" id="dns-result-text" data-i18n="dnsTitle">DNS Leak Test</div>
+        <div class="webrtc-sub" id="dns-sub" data-i18n="dnsSubReady">Check if DNS queries bypass your VPN and leak your true ISP</div>
     </div>
 
     <div class="webrtc-ips" id="dns-details" style="display:none">
         <div class="wrtc-row">
-            <span class="detail-label">IP Country:</span>
+            <span class="detail-label" data-i18n="labelIpCountry">IP Country:</span>
             <span id="dns-ip-country" class="detail-value">---</span>
         </div>
         <div class="wrtc-row">
-            <span class="detail-label">DNS Server:</span>
+            <span class="detail-label" data-i18n="labelDnsServer">DNS Server:</span>
             <span id="dns-server" class="detail-value">---</span>
         </div>
         <div class="wrtc-row">
-            <span class="detail-label">DNS Country:</span>
+            <span class="detail-label" data-i18n="labelDnsCountry">DNS Country:</span>
             <span id="dns-country" class="detail-value">---</span>
         </div>
         <div class="wrtc-row">
-            <span class="detail-label">Status:</span>
+            <span class="detail-label" data-i18n="labelStatus">Status:</span>
             <span id="dns-status-badge" class="detail-value">---</span>
         </div>
     </div>
 
-    <button id="dns-btn" class="check-btn" style="margin-top:8px">Run DNS Leak Test</button>
+    <button id="dns-btn" class="check-btn" style="margin-top:8px" data-i18n="btnRunDns">Run DNS Leak Test</button>
 </div>
 
 <!-- History Page -->
 <div id="page-history" style="display:none">
     <div class="history-top-bar">
-        <span class="history-header">IP History</span>
-        <button id="clear-history-btn" class="clear-btn">Clear All</button>
+        <span class="history-header" data-i18n="historyTitle">IP History</span>
+        <button id="clear-history-btn" class="clear-btn" data-i18n="btnClearAll">Clear All</button>
     </div>
     <div id="history-list" class="history-list"></div>
-    <div id="history-empty" class="history-empty" style="display:none">No history yet</div>
+    <div id="history-empty" class="history-empty" style="display:none" data-i18n="historyEmpty">No history yet</div>
 </div>
 
 <div class="footer">
-    Made with ❤️ by
+    <span data-i18n="footerMade">Made with ❤️ by</span>
     <a href="https://github.com/AbolfazlTafakori" target="_blank">ABOLFAZL</a>
 </div>
 
