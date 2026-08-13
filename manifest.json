@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "IP Guard",
-  "description": "Check your real IP address and protect your privacy",
-  "version": "2.0",
+  "description": "Check your real IP address, detect datacenter/ISP, and protect WebRTC privacy",
+  "version": "2.1",
   "icons": {
     "16": "icons/icon-16.png",
     "48": "icons/icon-48.png",
@@ -16,13 +16,23 @@
     "service_worker": "background.js"
   },
   "permissions": [
-    "privacy"
+    "privacy",
+    "storage",
+    "alarms"
   ],
   "host_permissions": [
     "https://api.ipify.org/*",
     "https://api6.ipify.org/*",
+    "https://api4.my-ip.io/*",
+    "https://api6.my-ip.io/*",
+    "https://ipv4.icanhazip.com/*",
+    "https://ipv6.icanhazip.com/*",
+    "https://ipwho.is/*",
+    "https://freeipapi.com/*",
     "https://ipapi.co/*",
     "https://ipinfo.io/*",
-    "https://freeipapi.com/*"
+    "http://ip-api.com/*",
+    "https://1.1.1.1/*",
+    "https://dns.google/*"
   ]
 }

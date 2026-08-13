@@ -1,29 +1,30 @@
 # 🛡️ IP Guard
 
-**Advanced IP Checker & Privacy Protection Tool for Chrome**
+**Advanced IP Checker, Datacenter Detection & Privacy Protection Tool for Chrome**
 
-![Version](https://img.shields.io/badge/Version-2.0-blue)
+![Version](https://img.shields.io/badge/Version-2.1-blue)
 ![Chrome](https://img.shields.io/badge/Chrome-Extension-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-A clean, fast, and privacy-focused extension to check your real IP address, detect your location and ISP, and identify your connection type.
+A clean, fast, and privacy-focused extension to check your real IP address, detect your location, ISP, and ASN, classify your connection type, and prevent WebRTC & DNS leaks.
 
 ---
 
 ## ✨ Features
 
-- 🌐 **Real Public IP** detection (IPv4 & IPv6)
-- 📍 Accurate **Country, City, and ISP** information
-- 🔍 **IP Type** detection — Residential / Data Center / Proxy / VPN
-- 🏳️ Country **flag display**
-- 📋 **Copy IP** to clipboard
-- 🕐 **IP History** — last 5 checked IPs
-- 🛡️ **WebRTC Leak Detection** — test if your real IP is exposed
-- 🔒 **WebRTC Protection** — block WebRTC leaks while keeping WebRTC functional
-- 🌙 Clean and modern **Dark Mode UI**
-- ⚡ Fast and lightweight
-- 🔒 **Privacy-first** — no data collection or tracking
-- 🚫 No unnecessary permissions
+- 🌐 **Dual-Stack Public IP** detection (IPv4 & IPv6 with fast fallbacks)
+- 📍 Accurate **Country, City, ISP, ASN, and Timezone** information
+- 🔍 **Advanced Connection Classifier** — Residential / Data Center / Proxy & VPN / Mobile / Business
+- 🛡️ **WebRTC Leak Detection** — multi-STUN candidate analysis to detect real public & local IP leaks
+- 🔒 **Persistent WebRTC Protection** — enforces strict IP handling policies across browser sessions
+- 🌐 **DNS Leak Detection** — checks for resolver location mismatches that bypass your VPN
+- ⚡ **Ping & Latency** measurement
+- 🏷️ **Background Country Badge** on extension icon
+- 📋 **One-Click Copy** for IPv4 and IPv6
+- 🕐 **IP History** with clear and export capabilities
+- 🌙 Modern **Dark Mode UI**
+- ⚡ Fast, lightweight, and zero bloat
+- 🔒 **Privacy-first** — no tracking or analytics
 
 ---
 
@@ -48,49 +49,46 @@ A clean, fast, and privacy-focused extension to check your real IP address, dete
 
 ## 🔒 Privacy & Security
 
-- No data is ever stored locally or remotely
-- No telemetry or analytics
-- Uses only trusted public IP APIs
-- Minimal permissions — only what's necessary
-- Fully open source and transparent
+- No user data is collected or tracked
+- Uses public, privacy-friendly endpoints
+- WebRTC policy strictly managed via Chrome's native privacy API
+- Fully open source
 
 ---
 
 ## 🛠️ Tech Stack
 
-- Manifest V3
-- Vanilla JavaScript
-- HTML / CSS (Dark UI)
+- Manifest V3 (Service Worker)
+- Vanilla JavaScript (Modern ES6+)
+- Native Chrome Privacy API (`webRTCIPHandlingPolicy`)
+- WebRTC RTCPeerConnection & STUN Protocol
+- Pure CSS3 Dark Design System
 
 ---
 
 ## 🗺️ Roadmap
 
-- [x] IPv4 & IPv6 detection
-- [x] Copy IP to clipboard
-- [x] IP History
-- [x] WebRTC leak detection
-- [x] WebRTC Protection (block leaks)
-- [x] Live auto-refresh (every 15 seconds)
-
-**Upcoming:**
-- [ ] VPN Monitor — notify when IP changes (VPN disconnected)
-- [ ] DNS Leak Detection — check if DNS requests bypass VPN
-- [ ] WHOIS Lookup — domain & IP ownership info
-- [ ] Ping & Latency — measure connection speed
-- [ ] Blacklist Check — see if your IP is blacklisted
-- [ ] Geolocation Map — show IP location on a map
+- [x] Dual-stack IPv4 & IPv6 detection
+- [x] Multi-STUN WebRTC leak detection & isolation
+- [x] Persistent WebRTC Protection (`disable_non_proxied_udp`)
+- [x] Advanced Datacenter & ASN Classifier
+- [x] DNS Leak Detection
+- [x] Ping & Latency measurement
+- [x] Background country badge
+- [x] IP History log with clear option
+- [ ] VPN Disconnect Desktop Notification
+- [ ] WHOIS Lookup
+- [ ] Geolocation Map View
 - [ ] Multi-language support
 
 ---
 
 ## 👤 Developer
 
-**Abolfazl Tafakori**
+**Abolfazl Tafakori**  
 GitHub: [@AbolfazlTafakori](https://github.com/AbolfazlTafakori)
 
 ---
 
 ⭐ If you like this extension, please give it a star and leave a review on the Chrome Web Store!
 
-**Keywords:** ip checker, ip address, privacy tool, isp detector, vpn test, data center detection, ip guard, chrome extension
